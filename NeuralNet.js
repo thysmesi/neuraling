@@ -1,3 +1,5 @@
+const _ = require('lodash')
+
 class NeuralNet {
     constructor(inputs, outputs, sizeOfHiddenLayer, numberOfHiddenLayers) {
         this.fitness = 0
@@ -8,10 +10,11 @@ class NeuralNet {
         this.numberOfHiddenLayers = numberOfHiddenLayers
         this.sizeOfHiddenLayer = sizeOfHiddenLayer
 
+        // ----- Setup Net Values With Random ----- //
         for (let index = 0; index < inputs.length; index++) {
             this.weights[inputs[index]] = {}
             for (let neuron = 0; neuron < sizeOfHiddenLayer; neuron++) {
-                this.weights[inputs[index]][`.h${0}_${neuron}`] = 0
+                this.weights[inputs[index]][`.h${0}_${neuron}`] = Math.random()
             }
         }
         for (let layer = 0; layer < numberOfHiddenLayers; layer++) {
@@ -19,19 +22,21 @@ class NeuralNet {
                 this.weights[`.h${layer}_${neuron}`] = {}
                 if (layer === numberOfHiddenLayers - 1) {
                     for (let index = 0; index < outputs.length; index++) {
-                        this.weights[`.h${layer}_${neuron}`][outputs[index]] = 0
+                        this.weights[`.h${layer}_${neuron}`][outputs[index]] = Math.random()
                     }
                 } else {
                     for (let index = 0; index < sizeOfHiddenLayer; index++) {
-                        this.weights[`.h${layer}_${neuron}`][`.h${layer+1}_${index}`] = 0
+                        this.weights[`.h${layer}_${neuron}`][`.h${layer+1}_${index}`] = Math.random()
                     }
                 }
             }
-            this.bias[`.b${layer}`] = 0
+            this.bias[`.b${layer}`] = Math.random()
         }
-        this.bias[`.bo`] = 0
+        this.bias[`.bo`] = Math.random()
     }
-    mapWeights(action) {
+
+    // ----- Maps The Nets Values ----- //
+    mapValues(action) {
         for (const neuron in this.weights) {
             for (const weight in this.weights[neuron]) {
                 this.weights[neuron][weight] = action(this.weights[neuron][weight])
@@ -41,19 +46,18 @@ class NeuralNet {
             this.bias[bias] = action(this.bias[bias])
         }
     }
+
+    // ----- Sigmoid Activation ----- //
     sigmoid(pass) {
         return 1 / (1 + Math.pow(Math.E, -pass));
     }
-    populateWeightsRandom() {
-        this.mapWeights(function () {
-            return Math.random()
-        })
-    }
+
+    // ----- Passthrough Given Input Data ----- //
     passthrough(data) {
         var calculated = {}
         var outputs = {}
 
-        // Calculate First Hidden Layer Values
+        // ----- Calculate First Hidden Layer Values ----- //
         for (let neuron = 0; neuron < this.sizeOfHiddenLayer; neuron++) {
             let neuronOut = 0
             for (const inputName in data) {
@@ -62,7 +66,7 @@ class NeuralNet {
             calculated[`.h${0}_${neuron}`] = this.sigmoid(neuronOut + this.bias['.b0'])
         }
 
-        // Calculate the rest of the hidden values
+        // ----- Calculate the rest of the hidden values ----- //
         for (let layer = 1; layer < this.numberOfHiddenLayers; layer++) {
             for (let neuron = 0; neuron < this.sizeOfHiddenLayer; neuron++) {
                 let neuronOut = 0
@@ -73,7 +77,7 @@ class NeuralNet {
             }
         }
 
-        // Calculate Outputs
+        // ----- Calculate Outputs ----- //
         for (let index = 0; index < this.outputs.length; index++) {
             let neuronOut = 0
             for (let neuron = 0; neuron < this.sizeOfHiddenLayer; neuron++) {
@@ -84,6 +88,8 @@ class NeuralNet {
 
         return outputs
     }
+
+    // ----- Mutate Function ----- //
     mutate(mutationRate) {
         var tempNet = _.cloneDeep(this)
 
@@ -93,6 +99,8 @@ class NeuralNet {
 
         return tempNet
     }
+
+    // ----- Creates a Json with Nets Values ----- //
     exportNet() {
         return (JSON.stringify({
             weights: this.weights,
@@ -103,6 +111,8 @@ class NeuralNet {
             sizeOfHiddenLayer: this.sizeOfHiddenLayer
         }))
     }
+
+    // ----- Import Net Values From Json ----- //
     uploadNet(json) {
         var obj = JSON.parse(json)
         this.weights = obj.weights,
@@ -114,5 +124,6 @@ class NeuralNet {
     }
 }
 
-
 exports.NeuralNet = NeuralNet
+
+var a = new NeuralNet()
