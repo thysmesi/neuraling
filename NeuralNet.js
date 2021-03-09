@@ -2,14 +2,19 @@ const _ = require('lodash')
 
 class NeuralNet {
     constructor(inputs, outputs, sizeOfHiddenLayer, numberOfHiddenLayers) {
+        inputs = inputs || ['in']
+        outputs = outputs || ['out']
+        numberOfHiddenLayers = numberOfHiddenLayers || 1
+        sizeOfHiddenLayer = sizeOfHiddenLayer || 1
+
         this.fitness = 0
         this.weights = {}
         this.bias = {}
-        this.inputs = inputs
-        this.outputs = outputs
-        this.numberOfHiddenLayers = numberOfHiddenLayers
-        this.sizeOfHiddenLayer = sizeOfHiddenLayer
-
+        this.inputs = inputs || ['in']
+        this.outputs = outputs || ['out']
+        this.numberOfHiddenLayers = numberOfHiddenLayers || 1
+        this.sizeOfHiddenLayer = sizeOfHiddenLayer || 1
+        
         // ----- Setup Net Values With Random ----- //
         for (let index = 0; index < inputs.length; index++) {
             this.weights[inputs[index]] = {}
@@ -125,5 +130,3 @@ class NeuralNet {
 }
 
 exports.NeuralNet = NeuralNet
-
-var a = new NeuralNet()
